@@ -1,1 +1,1 @@
-# hiking_difficulty_estimator
+Ce projet sert à estimer la difficulté d'un terrain de randonnée.
