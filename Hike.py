@@ -1,6 +1,6 @@
 import json
 
-with open('hikes.json') as f:
+with open('./hikes.json') as f:
     dict_data = json.load(f)
 
 class Hike():
