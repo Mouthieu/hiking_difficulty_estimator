@@ -50,13 +50,20 @@ class Hike:
             -> List[Tuple[Float, Float]]
 """
 
-MIN_DELAY = 250
+# CONSTANTS
+MIN_DELAY = 250 # in milliseconds
+
 GPX_FILE_NAME = "temp.gpx"
+
 PNG_PATH = "./screenshots/temp.png"
 HTML_PATH = "./screenshots/temp.html"
 GMAP_PATH = "./screenshots/google-map/"
 GPX_PLOT_PATH = "./screenshots/gpx-plot/"
 VISUALIZER_PATH = "./screenshots/gps-visualizer/"
+
+HIKES_NUMBER = 12141
+###########
+
 pipe = pipeline(task='depth-estimation', model='depth-anything/Depth-Anything-V2-Large-hf')
 
 def google_map(hike_number):
@@ -135,7 +142,7 @@ def gps_visualizer(hike_number):
         page.locator("input[type=file]").set_input_files(GPX_FILE_NAME)
         page.wait_for_timeout(MIN_DELAY)
 
-        print(page.locator("#homepage_submit").click())
+        page.locator("#homepage_submit").click()
         page.wait_for_timeout(MIN_DELAY * 2)
 
         page.screenshot(path=VISUALIZER_PATH + f'{hike_number}.png', full_page=True)
@@ -167,12 +174,14 @@ def gpx_plot(hike_number, gpx):
     plt.imshow(depth, cmap='inferno')
     plt.savefig(GPX_PLOT_PATH + f'{hike_number}.png')
 
-    
-
 if __name__ == '__main__':
-    hike = Hike(2)
-    gpx_plot(hike.number, hike.gpx)
-    google_map(hike.number)
+    for hike_number in range(2860, 3001):
+        try:
+            hike = Hike(hike_number)
+            gpx_plot(hike_number, hike.gpx)
+            google_map(hike_number)
+        except:
+            pass
     # gps_visualizer(hike.number)
 
     # add_all_tiles(the_map)
