@@ -3,6 +3,7 @@ from PIL import Image
 from playwright.sync_api import sync_playwright
 from transformers import pipeline
 
+
 from Hike import Hike
 
 """
@@ -57,7 +58,9 @@ HTML_PATH = "./screenshots/temp.html"
 GMAP_PATH = "./screenshots/google-map/"
 GPX_PLOT_PATH = "./screenshots/gpx-plot/"
 VISUALIZER_PATH = "./screenshots/gps-visualizer/"
-pipe = pipeline(task='depth-estimation', model='depth-anything/Depth-Anything-V2-Large-hf')
+# pipe = pipeline(task='depth-estimation', model='depth-anything/Depth-Anything-V2-Large-hf')
+
+hike_number = 111
 
 def google_map(hike_number):
     hike = Hike(hike_number)
@@ -114,7 +117,13 @@ def google_map(hike_number):
 
         browser.close()
 
+
+
 def gps_visualizer(hike_number):
+    """
+    Returns a screenshot of a hiking map
+    Takes as input the number of the hike
+    """
     hike = Hike(hike_number)
     with sync_playwright() as playwright:
         # Starting the browser
@@ -132,52 +141,62 @@ def gps_visualizer(hike_number):
         with open(GPX_FILE_NAME, "w") as file:
             file.write(hike.gpx)
 
+        # Uploading the GPX file
         page.locator("input[type=file]").set_input_files(GPX_FILE_NAME)
         page.wait_for_timeout(MIN_DELAY)
 
-        print(page.locator("#homepage_submit").click())
+        # Click on the button "Map it" of the website
+        page.locator("#homepage_submit").click()
         page.wait_for_timeout(MIN_DELAY * 2)
 
+        # Show new page with the hiking map only
+        page.goto(page.frames[1].url)
+        page.wait_for_timeout(MIN_DELAY)
+       
+        # Taking a screenshot of the map
         page.screenshot(path=VISUALIZER_PATH + f'{hike_number}.png', full_page=True)
+
+
+
 
 # TEST
 from gpxplotter import add_segment_to_map, create_folium_map, read_gpx_file
 
 
-def gpx_plot(hike_number, gpx):
-    with open(GPX_FILE_NAME, "w") as file:
-        file.write(gpx)
+# def gpx_plot(hike_number, gpx):
+#     with open(GPX_FILE_NAME, "w") as file:
+#         file.write(gpx)
 
-    the_map = create_folium_map(tiles='opentopomap')
-    for track in read_gpx_file(GPX_FILE_NAME):
-        for i, segment in enumerate(track['segments']):
-            add_segment_to_map(the_map, segment, line_options={'color': 'violet', 'weight': 5})
-    the_map.save(HTML_PATH)
+#     the_map = create_folium_map(tiles='opentopomap')
+#     for track in read_gpx_file(GPX_FILE_NAME):
+#         for i, segment in enumerate(track['segments']):
+#             add_segment_to_map(the_map, segment, line_options={'color': 'violet', 'weight': 5})
+#     the_map.save(HTML_PATH)
 
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch()
-        page = browser.new_page()
-        page.goto(f"file://C:/Users/Mouthieu/Documents/cours-et-projets/imt/ia-introduction/projet/" + HTML_PATH[2:])
-        page.wait_for_timeout(MIN_DELAY * 2)
-        page.screenshot(path=PNG_PATH, full_page=True)
-        browser.close()
+#     with sync_playwright() as playwright:
+#         browser = playwright.chromium.launch()
+#         page = browser.new_page()
+#         page.goto(f"file://C:/Users/Mouthieu/Documents/cours-et-projets/imt/ia-introduction/projet/" + HTML_PATH[2:])
+#         page.wait_for_timeout(MIN_DELAY * 2)
+#         page.screenshot(path=PNG_PATH, full_page=True)
+#         browser.close()
 
-    img = Image.open(PNG_PATH)
-    depth = pipe(img)['depth']
-    plt.imshow(depth, cmap='inferno')
-    plt.savefig(GPX_PLOT_PATH + f'{hike_number}.png')
+#     img = Image.open(PNG_PATH)
+#     depth = pipe(img)['depth']
+#     plt.imshow(depth, cmap='inferno')
+# #     plt.savefig(GPX_PLOT_PATH + f'{hike_number}.png')
 
     
 
-if __name__ == '__main__':
-    hike = Hike(2)
-    gpx_plot(hike.number, hike.gpx)
-    google_map(hike.number)
-    # gps_visualizer(hike.number)
+# if __name__ == '__main__':
+#     hike = Hike(2)
+#     gpx_plot(hike.number, hike.gpx)
+#     google_map(hike.number)
+#     # gps_visualizer(hike.number)
 
-    # add_all_tiles(the_map)
-    # add_tiles_to_map(the_map, 'Stamen Terrain')
-    # the_map.show_in_browser()
-    # run(hike.number)
-    # gps_visualizer(hike.number)
-    # img = Image.open('./screenshots/example.png').show()
+#     # add_all_tiles(the_map)
+#     # add_tiles_to_map(the_map, 'Stamen Terrain')
+#     # the_map.show_in_browser()
+#     # run(hike.number)
+#     # gps_visualizer(hike.number)
+#     # img = Image.open('./screenshots/example.png').show()
