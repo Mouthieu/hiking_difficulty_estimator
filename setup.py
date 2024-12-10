@@ -55,7 +55,7 @@ MIN_DELAY = 250 # in milliseconds
 
 GPX_FILE_NAME = "temp.gpx"
 
-PNG_PATH = "./screenshots/temp.png"
+PNG_PATH = "./screenshots/gpx-plot/"
 HTML_PATH = "./screenshots/temp.html"
 GMAP_PATH = "./screenshots/google-map/"
 GPX_PLOT_PATH = "./screenshots/gpx-plot/"
@@ -135,13 +135,15 @@ def gps_visualizer(hike_number):
         page.get_by_role("button").nth(2).click()
         page.wait_for_timeout(MIN_DELAY)
 
-        # Clicking on the "Choose File" button
+        # Creating a "temp.gpx" file and saving it into the current directory
         with open(GPX_FILE_NAME, "w") as file:
             file.write(hike.gpx)
 
+        # Clicking on the "Choose File" button
         page.locator("input[type=file]").set_input_files(GPX_FILE_NAME)
         page.wait_for_timeout(MIN_DELAY)
 
+        # Clicking on the "Submit" button
         page.locator("#homepage_submit").click()
         page.wait_for_timeout(MIN_DELAY * 2)
 
@@ -158,28 +160,24 @@ def gpx_plot(hike_number, gpx):
     the_map = create_folium_map(tiles='opentopomap')
     for track in read_gpx_file(GPX_FILE_NAME):
         for i, segment in enumerate(track['segments']):
-            add_segment_to_map(the_map, segment, line_options={'color': 'violet', 'weight': 5})
+            add_segment_to_map(the_map, segment, line_options={'color': 'red', 'weight': 3})
     the_map.save(HTML_PATH)
 
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
         page = browser.new_page()
         page.goto(f"file://C:/Users/Mouthieu/Documents/cours-et-projets/imt/ia-introduction/projet/" + HTML_PATH[2:])
-        page.wait_for_timeout(MIN_DELAY * 2)
-        page.screenshot(path=PNG_PATH, full_page=True)
+        page.wait_for_timeout(MIN_DELAY * 8)
+        page.screenshot(path=f'{PNG_PATH}gpx_plot_{hike_number}.png', full_page=True)
+        print(f"Screenshot of hike#{hike_number} saved.")
         browser.close()
 
-    img = Image.open(PNG_PATH)
-    depth = pipe(img)['depth']
-    plt.imshow(depth, cmap='inferno')
-    plt.savefig(GPX_PLOT_PATH + f'{hike_number}.png')
-
 if __name__ == '__main__':
-    for hike_number in range(2860, 3001):
+    for hike_number in range(172, 3001):
         try:
             hike = Hike(hike_number)
             gpx_plot(hike_number, hike.gpx)
-            google_map(hike_number)
+            # google_map(hike_number)
         except:
             pass
     # gps_visualizer(hike.number)

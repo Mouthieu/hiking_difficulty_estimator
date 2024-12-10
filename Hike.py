@@ -81,6 +81,7 @@ class Hike():
         return int(string.split(":")[0]), int(string.split(":")[1]), int(string.split(":")[2])
     
     def _substract_times(self, time1, time2):
+        
         seconds = time1[2] - time2[2]
         minutes = time1[1] - time2[1]
         hours   = time1[0] - time2[0]
@@ -91,3 +92,14 @@ class Hike():
             minutes += 60
             hours -= 1
         return (hours, minutes, seconds)
+    
+    def get_difficulty(self):
+        """
+        ### Returns the difficulty of the hike and a description of the difficulty's meaning
+
+        Returns: `Tuple[String, String]`
+            - `T1 | T2 | T3 | T4 | T5`
+            - The description
+        """
+        split = self.difficulty.split(" ")
+        return split[0], split[2]

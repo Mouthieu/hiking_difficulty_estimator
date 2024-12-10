@@ -1,7 +1,8 @@
 gpx-tracks-from-hikr.org.csv
 hikes.json
 temp.gpx
-screenshots/temp.html
-screenshots/temp.png
-screenshots/google-map/*
-screenshots/gpx-plot/*
+screenshots/google-map
+screenshots/gps-visualizer
+screenshots/depth-gpx-plot
+screenshots/gpx-plot
+test.ipynb
