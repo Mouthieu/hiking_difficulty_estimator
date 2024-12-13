@@ -55,11 +55,11 @@ MIN_DELAY = 250 # in milliseconds
 
 GPX_FILE_NAME = "temp.gpx"
 
-PNG_PATH = "./screenshots/gpx-plot/"
+PNG_PATH = "./screenshots/gpx_plot/"
 HTML_PATH = "./screenshots/temp.html"
-GMAP_PATH = "./screenshots/google-map/"
-GPX_PLOT_PATH = "./screenshots/gpx-plot/"
-VISUALIZER_PATH = "./screenshots/gps-visualizer/"
+GMAP_PATH = "./screenshots/google_map/"
+GPX_PLOT_PATH = "./screenshots/gpx_plot/"
+VISUALIZER_PATH = "./screenshots/gps_visualizer/"
 
 HIKES_NUMBER = 12141
 ###########
@@ -117,9 +117,11 @@ def google_map(hike_number):
         #     print(loc.all().get_attribute("role"))
 
         # Taking a screenshot of the map
-        page.screenshot(path=GMAP_PATH + f'{hike_number}.png', full_page=True)
+        page.screenshot(path=GMAP_PATH + f'google_map_{hike_number}.png', full_page=True)
+        print(f"Screenshot of hike#{hike_number} saved as google_map_{hike_number}.png")
 
         browser.close()
+        playwright.stop()
 
 
 
@@ -155,10 +157,14 @@ def gps_visualizer(hike_number):
 
         # Show new page with the hiking map only
         page.goto(page.frames[1].url)
-        page.wait_for_timeout(MIN_DELAY)
+        page.wait_for_timeout(MIN_DELAY * 2)
        
         # Taking a screenshot of the map
-        page.screenshot(path=VISUALIZER_PATH + f'{hike_number}.png', full_page=True)
+        page.screenshot(path=VISUALIZER_PATH + f'gps_visualizer_{hike_number}.png', full_page=True)
+        print(f"Screenshot of hike#{hike_number} saved as gps_visualizer_{hike_number}.png")
+
+        browser.close()
+        playwright.stop()
 
 
 
@@ -181,16 +187,18 @@ def gpx_plot(hike_number, gpx):
         browser = playwright.chromium.launch()
         page = browser.new_page()
         page.goto(f"file://C:/Users/Mouthieu/Documents/cours-et-projets/imt/ia-introduction/projet/" + HTML_PATH[2:])
-        page.wait_for_timeout(MIN_DELAY * 8)
+        page.wait_for_timeout(MIN_DELAY * 12)
         page.screenshot(path=f'{PNG_PATH}gpx_plot_{hike_number}.png', full_page=True)
-        print(f"Screenshot of hike#{hike_number} saved.")
+        print(f"Screenshot of hike#{hike_number} saved as gpx_plot_{hike_number}.png")
         browser.close()
+        playwright.stop()
 
 if __name__ == '__main__':
-    for hike_number in range(172, 3001):
+    for hike_number in range(1001):
         try:
             hike = Hike(hike_number)
             gpx_plot(hike_number, hike.gpx)
+            # gps_visualizer(hike_number)
             # google_map(hike_number)
         except:
             pass
